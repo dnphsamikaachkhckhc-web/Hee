@@ -1,0 +1,21 @@
+name: Build Compat146
+on: [workflow_dispatch, push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+      - name: Prepare references
+        run: |
+          mkdir -p refs
+          cp TShockAPI.dll ModFramework.dll TerrariaServer.dll refs/ 2>/dev/null || true
+          curl -L -o refs/OTAPI.dll "https://github.com/dnphsamikaachkhckhc-web/Hee/releases/download/v6.2.1-refs/OTAPI.dll"
+      - run: dotnet build Compat146.csproj -c Release -p:RefPath="$GITHUB_WORKSPACE/refs" -o out
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Compat146-dll
+          path: out/Compat146.dll
+          
